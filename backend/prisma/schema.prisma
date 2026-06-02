@@ -1,0 +1,82 @@
+// backend/prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Perfis de acesso do sistema (Níveis de Permissão)
+enum Cargo {
+  ADMINISTRADOR
+  GERENCIAMENTO_OPERACOES
+  USUARIO_MIDIA
+  USUARIO_ESCRITA
+  USUARIO_ATENDIMENTO
+}
+
+// Status do fluxo de processos estilo Kanban
+enum StatusTarefa {
+  RECEBIDO
+  EM_ANALISE
+  EM_DESENVOLVIMENTO
+  EM_APROVACAO
+  CONCLUIDO
+}
+
+// Categorias de chamados do atendimento ao cliente
+enum CategoriaChamado {
+  RECLAMACAO
+  SUGESTAO
+  DUVIDA
+  ELOGIO
+}
+
+// Modelo de Usuários da plataforma
+model Usuario {
+  id           String   @id @default(uuid())
+  nome         String
+  email        String   @unique
+  senha_hash   String
+  cargo        Cargo    @default(USUARIO_ATENDIMENTO)
+  criado_em    DateTime @default(now())
+  
+  // Relacionamentos
+  tarefas_atribuidas Tarefa[] @relation("ResponsavelTarefa")
+  chamados_abertos   Chamado[] @relation("CriadorChamado")
+}
+
+// Modelo de Tarefas (Kanban unificado para Mídia, Escrita e Operações)
+model Tarefa {
+  id           String       @id @default(uuid())
+  titulo       String
+  descricao    String?
+  status       StatusTarefa @default(RECEBIDO)
+  setor        Cargo        // Define qual setor/empresa terceirizada é dona da tarefa
+  prioridade   Int          @default(1) // 1: Baixa, 2: Média, 3: Alta, 4: Crítica
+  prazo        DateTime?
+  criado_em    DateTime     @default(now())
+  atualizado_em DateTime     @updatedAt
+
+  // Chave estrangeira para quem vai executar
+  responsavel_id String?
+  responsavel    Usuario?   @relation("ResponsavelTarefa", fields: [responsavel_id], references: [id])
+}
+
+// Modelo de Chamados (Módulo de Atendimento ao Cliente)
+model Chamado {
+  id           String           @id @default(uuid())
+  assunto      String
+  categoria    CategoriaChamado
+  prioridade   Int              @default(1) // 1: Baixa, 2: Média, 3: Alta, 4: Crítica
+  status       String           @default("ABERTO") // ABERTO, EM_ANDAMENTO, RESOLVIDO
+  criado_em    DateTime         @default(now())
+  atualizado_em DateTime         @updatedAt
+  
+  // Chave estrangeira para o atendente que registrou
+  criador_id   String
+  criador      Usuario          @relation("CriadorChamado", fields: [criador_id], references: [id])
+}
