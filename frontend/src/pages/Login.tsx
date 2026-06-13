@@ -106,10 +106,10 @@ export function Login({ onLoginSuccess }: LoginProps) {
             SF
           </div>
           <h2 className="text-2xl font-black tracking-tight text-white">
-            Fábrica SweetFlow
+            Sistema SweetFlow
           </h2>
           <p className="text-gray-400 text-xs mt-1">
-            Insira suas credenciais administrativas para acessar as esteiras.
+            Insira suas credenciais administrativas para acessar o sistema.
           </p>
         </div>
 

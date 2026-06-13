@@ -25,7 +25,7 @@ fastify.register(cors, {
 fastify.get("/", async () => {
   return {
     status: "online",
-    message: "Fábrica SweetFlow API ativa e rodando perfeitamente na Vercel!",
+    message: "Sistema SweetFlow API ativa e rodando perfeitamente na Vercel!",
   };
 });
 
