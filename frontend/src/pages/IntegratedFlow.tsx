@@ -49,7 +49,7 @@ const COLUNAS = [
   },
   {
     id: "EM_DESENVOLVIMENTO",
-    titulo: "Em Dev",
+    titulo: "Em Desenvolvimento",
     cor: "border-t-yellow-500 text-yellow-400 bg-yellow-500/5",
   },
   {
@@ -152,8 +152,7 @@ export function IntegratedFlow() {
           Esteira de Fluxo Integrado
         </h1>
         <p className="text-gray-400 text-sm mt-1">
-          Gerenciamento visual em pipeline com persistência atômica no
-          PostgreSQL.
+          Visualize e gerencie o ciclo completo das demandas operacionais.
         </p>
       </div>
 

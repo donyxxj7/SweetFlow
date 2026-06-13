@@ -10,7 +10,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { api } from "../services/api";
-import Swal from "sweetalert2"; // IMPORTANTE: Importa o SweetAlert2 para os pop-ups customizados
+import Swal from "sweetalert2";
 
 export type SetorTipo =
   | "Atendimento ao Cliente"
@@ -197,9 +197,6 @@ export function Operacoes() {
     carregarTarefas();
   }, []);
 
-  // =========================================================================
-  // POP-UP ATUALIZADO: Deletar Tarefa com SweetAlert2 integrado ao Dark Mode
-  // =========================================================================
   const handleExcluirTarefa = async (id: string, titulo: string) => {
     const resultadoSwal = await Swal.fire({
       title: "Confirmar Exclusão?",
@@ -208,13 +205,11 @@ export function Operacoes() {
       showCancelButton: true,
       confirmButtonText: "Sim, Deletar",
       cancelButtonText: "Cancelar",
-      background: "#111827", // bg-gray-900 do seu tema
-      color: "#f3f4f6", // text-gray-100
-      confirmButtonColor: "#ef4444", // Vermelho destrutivo
-      cancelButtonColor: "#374151", // Botão cinza discreto
-      customClass: {
-        popup: "border border-gray-800 rounded-2xl shadow-2xl",
-      },
+      background: "#111827",
+      color: "#f3f4f6",
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#374151",
+      customClass: { popup: "border border-gray-800 rounded-2xl shadow-2xl" },
     });
 
     if (!resultadoSwal.isConfirmed) return;
@@ -224,7 +219,6 @@ export function Operacoes() {
       await api.delete(`/tarefas/${id}`);
       setTarefas((listaAntiga) => listaAntiga.filter((t) => t.id !== id));
 
-      // Feedback visual moderno de sucesso (estilo toast rápido)
       Swal.fire({
         title: "Deletado!",
         text: "A solicitação foi apagada com sucesso.",
@@ -235,7 +229,6 @@ export function Operacoes() {
         color: "#f3f4f6",
       });
     } catch (erro) {
-      console.error("Falha ao deletar item no Neon:", erro);
       Swal.fire({
         title: "Erro Crítico",
         text: "Não foi possível excluir do servidor remoto.",
@@ -267,7 +260,6 @@ export function Operacoes() {
       setNovoPrazo("");
       setNovoSetor("Gerenciamento de Operações");
 
-      // Feedback moderno de criação com sucesso
       Swal.fire({
         title: "Sucesso!",
         text: "Nova solicitação operacional registrada.",
@@ -333,26 +325,26 @@ export function Operacoes() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-100 p-6 md:p-8 ml-0 md:ml-64 transition-all duration-300">
-      {/* Topo */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+    <div className="min-h-screen bg-gray-950 text-gray-100 p-4 sm:p-6 md:p-8 transition-all duration-300 overflow-x-hidden">
+      {/* Topo Responsivo */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-3xl font-black tracking-tight text-white">
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
             Gerenciamento de Operações
           </h1>
-          <p className="text-gray-400 text-sm mt-1">
-            Sincronização imediata com banco relacional PostgreSQL do Neon Tech.
+          <p className="text-gray-400 text-xs sm:text-sm mt-1">
+            Controle total das demandas operacionais.
           </p>
         </div>
         <button
           onClick={() => setModalAberto(true)}
-          className="bg-linear-to-r from-teal-500 to-emerald-500 text-gray-950 font-bold py-2.5 px-4 rounded-xl flex items-center gap-2 hover:opacity-90 transition-opacity cursor-pointer text-sm shadow-lg shadow-teal-500/10"
+          className="w-full sm:w-auto bg-linear-to-r from-teal-500 to-emerald-500 text-gray-950 font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-opacity cursor-pointer text-sm shadow-lg shadow-teal-500/10"
         >
           <Plus className="w-4 h-4 stroke-3" /> Criar Solicitação
         </button>
       </div>
 
-      {/* Filtros */}
+      {/* Painel de Filtros Avançados */}
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 mb-6 flex flex-col lg:flex-row gap-4 justify-between items-center shadow-xl">
         <div className="relative w-full lg:max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
@@ -361,21 +353,23 @@ export function Operacoes() {
             placeholder="Buscar por demanda ou responsável..."
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
-            className="w-full bg-gray-950 border border-gray-800 rounded-xl py-2 pl-10 pr-4 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-teal-500 transition-colors"
+            className="w-full bg-gray-950 border border-gray-800 rounded-xl py-2.5 pl-10 pr-4 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-teal-500 transition-colors"
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-end">
-          <div className="flex items-center gap-2 bg-gray-950 border border-gray-800 px-3 py-1.5 rounded-xl text-xs text-gray-400">
-            <Filter className="w-3.5 h-3.5 text-teal-400" />
-            <span>Setor:</span>
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto justify-end">
+          <div className="flex items-center gap-2 bg-gray-950 border border-gray-800 px-3 py-2 rounded-xl text-xs text-gray-400 w-full sm:w-auto justify-between sm:justify-start">
+            <div className="flex items-center gap-1.5">
+              <Filter className="w-3.5 h-3.5 text-teal-400" />
+              <span>Setor:</span>
+            </div>
             <select
               value={filtroSetor}
               onChange={(e) => setFiltroSetor(e.target.value)}
               className="bg-transparent text-white font-semibold focus:outline-none cursor-pointer ml-1 text-xs"
             >
               <option value="Todos" className="bg-gray-900">
-                Todos os Setores
+                Todos
               </option>
               <option value="Atendimento ao Cliente" className="bg-gray-900">
                 Atendimento ao Cliente
@@ -407,9 +401,11 @@ export function Operacoes() {
             </select>
           </div>
 
-          <div className="flex items-center gap-2 bg-gray-950 border border-gray-800 px-3 py-1.5 rounded-xl text-xs text-gray-400">
-            <SlidersHorizontal className="w-3.5 h-3.5 text-teal-400" />
-            <span>Prioridade:</span>
+          <div className="flex items-center gap-2 bg-gray-950 border border-gray-800 px-3 py-2 rounded-xl text-xs text-gray-400 w-full sm:w-auto justify-between sm:justify-start">
+            <div className="flex items-center gap-1.5">
+              <SlidersHorizontal className="w-3.5 h-3.5 text-teal-400" />
+              <span>Prioridade:</span>
+            </div>
             <select
               value={filtroPrioridade}
               onChange={(e) => setFiltroPrioridade(e.target.value)}
@@ -435,109 +431,186 @@ export function Operacoes() {
         </div>
       </div>
 
-      {/* Tabela Administrativa Principal */}
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-2xl">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-gray-800 bg-gray-900/50 text-gray-400 text-xs font-semibold uppercase tracking-wider">
-                <th className="px-6 py-4">Demanda / Solicitação</th>
-                <th className="px-6 py-4">Responsável</th>
-                <th className="px-6 py-4">Setor Destino</th>
-                <th className="px-6 py-4">Prioridade</th>
-                <th className="px-6 py-4">Status Atual</th>
-                <th className="px-6 py-4">Prazo Final</th>
-                <th className="px-6 py-4 text-center">Ações</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-800/60 text-sm">
-              {carregando ? (
-                <tr>
-                  <td
-                    colSpan={7}
-                    className="px-6 py-12 text-center text-gray-500 text-sm"
-                  >
-                    <div className="flex items-center justify-center gap-2 text-teal-400 font-medium">
-                      <Loader2 className="w-4 h-4 animate-spin" /> Buscando
-                      fluxos operacionais na nuvem...
-                    </div>
-                  </td>
-                </tr>
-              ) : tarefasFiltradas.length > 0 ? (
-                tarefasFiltradas.map((tarefa) => (
-                  <tr
-                    key={tarefa.id}
-                    className={`hover:bg-gray-800/30 transition-colors ${excluindoId === tarefa.id ? "opacity-30 pointer-events-none" : ""}`}
-                  >
-                    <td className="px-6 py-4.5 font-medium text-white max-w-xs md:max-w-md truncate">
+      {/* ESTADO DE CARREGAMENTO */}
+      {carregando && (
+        <div className="py-12 px-6 bg-gray-900 border border-gray-800 rounded-2xl text-center shadow-xl flex items-center justify-center gap-2 text-teal-400 font-medium">
+          <Loader2 className="w-5 h-5 animate-spin" /> Buscando fluxos
+          operacionais na nuvem...
+        </div>
+      )}
+
+      {/* VERSÃO MOBILE: CARDS VERTICAIS */}
+      {!carregando && (
+        <div className="block lg:hidden space-y-4">
+          {tarefasFiltradas.length > 0 ? (
+            tarefasFiltradas.map((tarefa) => (
+              <div
+                key={tarefa.id}
+                className={`bg-gray-900 border border-gray-800 rounded-2xl p-5 shadow-lg relative ${excluindoId === tarefa.id ? "opacity-30 pointer-events-none" : ""}`}
+              >
+                <div className="flex justify-between items-start gap-2 mb-4">
+                  <div className="flex flex-col gap-1.5">
+                    <span
+                      className={`inline-flex px-2.5 py-1 rounded-full text-[10px] font-bold border ${getEstiloStatus(tarefa.status)}`}
+                    >
+                      {tarefa.status.replace("_", " ")}
+                    </span>
+                    <h3 className="text-base font-black tracking-tight text-white leading-tight wrap-break-word">
                       {tarefa.titulo}
-                    </td>
-                    <td className="px-6 py-4.5 text-gray-300">
+                    </h3>
+                  </div>
+
+                  <button
+                    disabled={excluindoId !== null}
+                    onClick={() =>
+                      handleExcluirTarefa(tarefa.id, tarefa.titulo)
+                    }
+                    className="p-2.5 rounded-xl bg-red-500/5 border border-red-500/10 text-red-400 hover:bg-red-500 hover:text-gray-950 transition-all cursor-pointer disabled:opacity-40"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-x-4 gap-y-3 pt-4 border-t border-gray-800/60">
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                      Responsável
+                    </span>
+                    <span className="text-sm font-semibold text-gray-200">
                       {tarefa.responsavel}
-                    </td>
-                    <td className="px-6 py-4.5">
-                      <span className="bg-gray-950 px-2.5 py-1 rounded-md border border-gray-800 text-xs font-medium text-gray-400 whitespace-nowrap">
-                        {tarefa.setorDestino}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4.5">
-                      <span
-                        className={`px-2.5 py-1 rounded-md text-xs border ${getEstiloPrioridade(tarefa.prioridade)}`}
-                      >
-                        {tarefa.prioridade}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4.5">
-                      <span
-                        className={`px-2.5 py-1 rounded-full text-xs font-bold border ${getEstiloStatus(tarefa.status)}`}
-                      >
-                        {tarefa.status.replace("_", " ")}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4.5 text-gray-400 text-xs font-mono">
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <Calendar className="w-3.5 h-3.5 text-gray-500" />{" "}
-                        {tarefa.prazo}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4.5 text-center">
-                      <button
-                        disabled={excluindoId !== null}
-                        onClick={() =>
-                          handleExcluirTarefa(tarefa.id, tarefa.titulo)
-                        }
-                        className="p-2 rounded-xl bg-red-500/5 border border-red-500/10 text-red-400 hover:bg-red-500 hover:text-gray-950 transition-all cursor-pointer disabled:opacity-40"
-                        title="Excluir solicitação permanentemente"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                      Prioridade
+                    </span>
+                    <span
+                      className={`inline-flex items-center w-fit px-2 py-0.5 mt-0.5 rounded-md text-[11px] border ${getEstiloPrioridade(tarefa.prioridade)}`}
+                    >
+                      {tarefa.prioridade}
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                      Setor Destino
+                    </span>
+                    <span className="text-xs font-medium text-teal-400 truncate">
+                      {tarefa.setorDestino}
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                      Prazo Final
+                    </span>
+                    <span className="text-xs font-mono font-medium text-gray-400 flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-gray-600" />{" "}
+                      {tarefa.prazo}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-center py-8 text-gray-600 bg-gray-900 border border-gray-800 rounded-2xl text-xs">
+              Nenhuma demanda operacional registrada no banco Neon.
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* VERSÃO DESKTOP: TABELA ADMINISTRATIVA CLÁSSICA */}
+      {!carregando && (
+        <div className="hidden lg:block bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-2xl">
+          <div className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-800">
+            <table className="w-full text-left border-collapse min-w-200">
+              <thead>
+                <tr className="border-b border-gray-800 bg-gray-900/50 text-gray-400 text-xs font-semibold uppercase tracking-wider">
+                  <th className="px-6 py-4">Demanda / Solicitação</th>
+                  <th className="px-6 py-4">Responsável</th>
+                  <th className="px-6 py-4">Setor Destino</th>
+                  <th className="px-6 py-4">Prioridade</th>
+                  <th className="px-6 py-4">Status Atual</th>
+                  <th className="px-6 py-4">Prazo Final</th>
+                  <th className="px-6 py-4 text-center">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-800/60 text-sm">
+                {tarefasFiltradas.length > 0 ? (
+                  tarefasFiltradas.map((tarefa) => (
+                    <tr
+                      key={tarefa.id}
+                      className={`hover:bg-gray-800/30 transition-colors ${excluindoId === tarefa.id ? "opacity-30 pointer-events-none" : ""}`}
+                    >
+                      <td className="px-6 py-4 font-medium text-white max-w-xs md:max-w-md truncate wrap-break-word">
+                        {tarefa.titulo}
+                      </td>
+                      <td className="px-6 py-4 text-gray-300">
+                        {tarefa.responsavel}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="bg-gray-950 px-2.5 py-1 rounded-md border border-gray-800 text-xs font-medium text-gray-400">
+                          {tarefa.setorDestino}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`px-2.5 py-1 rounded-md text-xs border ${getEstiloPrioridade(tarefa.prioridade)}`}
+                        >
+                          {tarefa.prioridade}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`px-2.5 py-1 rounded-full text-xs font-bold border ${getEstiloStatus(tarefa.status)}`}
+                        >
+                          {tarefa.status.replace("_", " ")}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-gray-400 text-xs font-mono">
+                        <div className="flex items-center gap-1.5">
+                          <Calendar className="w-3.5 h-3.5 text-gray-500" />{" "}
+                          {tarefa.prazo}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <button
+                          disabled={excluindoId !== null}
+                          onClick={() =>
+                            handleExcluirTarefa(tarefa.id, tarefa.titulo)
+                          }
+                          className="p-2 rounded-xl bg-red-500/5 border border-red-500/10 text-red-400 hover:bg-red-500 hover:text-gray-950 transition-all cursor-pointer disabled:opacity-40"
+                          title="Excluir solicitação permanentemente"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={7}
+                      className="px-6 py-12 text-center text-gray-500 text-sm"
+                    >
+                      Nenhuma demanda registrada no banco.
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan={7}
-                    className="px-6 py-12 text-center text-gray-500 text-sm"
-                  >
-                    Nenhuma demanda registrada no banco.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* MODAL PARA CRIAR SOLICITAÇÃO REAIS */}
+      {/* MODAL RESPONSIVO */}
       {modalAberto && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-lg p-6 shadow-2xl relative">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-lg p-5 sm:p-6 shadow-2xl my-auto">
             <h3 className="text-xl font-bold text-white mb-1">
               Nova Solicitação Operacional
             </h3>
-            <p className="text-gray-400 text-xs mb-6">
-              Gravação e persistência estruturada via API.
+            <p className="text-gray-400 text-xs mb-5">
+              Preencha os detalhes para criar uma nova demanda operacional.
             </p>
 
             <form onSubmit={handleCriarTarefa} className="space-y-4">
@@ -549,10 +622,10 @@ export function Operacoes() {
                   type="text"
                   required
                   disabled={enviando}
-                  placeholder="Ex: Desenhar cronograma de postagens ou conferir lote"
+                  placeholder="Ex: Desenhar cronograma de postagens"
                   value={novoTitulo}
                   onChange={(e) => setNovoTitulo(e.target.value)}
-                  className="w-full bg-gray-950 border border-gray-800 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:border-teal-500 transition-colors disabled:opacity-40"
+                  className="w-full bg-gray-950 border border-gray-800 rounded-xl py-2.5 px-3 text-white text-sm focus:outline-none focus:border-teal-500 transition-colors disabled:opacity-40"
                 />
               </div>
 
@@ -565,7 +638,7 @@ export function Operacoes() {
                     disabled={enviando}
                     value={novoSetor}
                     onChange={(e) => setNovoSetor(e.target.value as SetorTipo)}
-                    className="w-full bg-gray-950 border border-gray-800 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:border-teal-500 cursor-pointer h-9.5 disabled:opacity-40"
+                    className="w-full bg-gray-950 border border-gray-800 rounded-xl py-2.5 px-3 text-white text-sm focus:outline-none focus:border-teal-500 cursor-pointer disabled:opacity-40"
                   >
                     <option value="Atendimento ao Cliente">
                       Atendimento ao Cliente
@@ -597,7 +670,7 @@ export function Operacoes() {
                     }
                     value={novoResponsavelId}
                     onChange={(e) => setNovoResponsavelId(e.target.value)}
-                    className="w-full bg-gray-950 border border-gray-800 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:border-teal-500 cursor-pointer h-9.5 disabled:opacity-40"
+                    className="w-full bg-gray-950 border border-gray-800 rounded-xl py-2.5 px-3 text-white text-sm focus:outline-none focus:border-teal-500 cursor-pointer disabled:opacity-40 h-10.5"
                   >
                     {responsaveisFiltradosDoModal.length > 0 ? (
                       responsaveisFiltradosDoModal.map((membro) => (
@@ -621,7 +694,7 @@ export function Operacoes() {
                     disabled={enviando}
                     value={novaPrioridade}
                     onChange={(e) => setNovaPrioridade(e.target.value as any)}
-                    className="w-full bg-gray-950 border border-gray-800 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:border-teal-500 cursor-pointer disabled:opacity-40"
+                    className="w-full bg-gray-950 border border-gray-800 rounded-xl py-2.5 px-3 text-white text-sm focus:outline-none focus:border-teal-500 cursor-pointer disabled:opacity-40"
                   >
                     <option value="Baixa">Baixa</option>
                     <option value="Média">Média</option>
@@ -645,7 +718,7 @@ export function Operacoes() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-800 mt-6">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-800 mt-5">
                 <button
                   type="button"
                   disabled={enviando}
@@ -657,9 +730,13 @@ export function Operacoes() {
                 <button
                   type="submit"
                   disabled={enviando}
-                  className="bg-linear-to-r from-teal-500 to-emerald-500 text-gray-950 font-bold py-2 px-4 rounded-xl text-sm hover:opacity-90 transition-opacity cursor-pointer flex items-center justify-center disabled:opacity-50"
+                  className="bg-linear-to-r from-teal-500 to-emerald-500 text-gray-950 font-bold py-2.5 px-4 rounded-xl text-sm hover:opacity-90 transition-opacity cursor-pointer flex items-center justify-center disabled:opacity-50 min-w-30"
                 >
-                  {enviando ? "Salvando na nuvem..." : "Confirmar Envio"}
+                  {enviando ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    "Confirmar Envio"
+                  )}
                 </button>
               </div>
             </form>
