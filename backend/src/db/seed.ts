@@ -113,14 +113,14 @@ async function main() {
     {
       id: "44444444-4444-4444-4444-222222222222",
       nome: "Pedro Ramos",
-      login: "pramos",
+      login: "pedro ramos",
       senha: "123",
       setor: "Escrita de Textos",
     },
     {
       id: "44444444-4444-4444-4444-333333333333",
       nome: "Pedro Venturini",
-      login: "pventurini",
+      login: "pedro venturini",
       senha: "123",
       setor: "Escrita de Textos",
     },
