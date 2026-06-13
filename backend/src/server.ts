@@ -10,8 +10,8 @@ const fastify = Fastify({
   logger: true,
 });
 
-// 1. Registra os plugins direto no escopo principal do arquivo
-await fastify.register(cors, {
+// Registra os plugins e rotas de forma limpa
+fastify.register(cors, {
   origin: true,
   methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
@@ -25,7 +25,7 @@ await fastify.register(cors, {
 fastify.get("/", async () => {
   return {
     status: "online",
-    message: "Fábrica SweetFlow API ativa e rodando lisa na Vercel!",
+    message: "Fábrica SweetFlow API ativa e rodando perfeitamente na Vercel!",
   };
 });
 
@@ -113,10 +113,7 @@ fastify.delete("/tarefas/:id", async (request, reply) => {
   }
 });
 
-// 2. AJUSTE SÊNIOR PARA A VERCEL: Prepara o Fastify de forma assíncrona imediata
-await fastify.ready();
-
-// Inicialização local padrão (Só roda na sua máquina)
+// Inicialização local padrão (Só roda na sua máquina - executa o listen tradicional)
 if (process.env.NODE_ENV !== "production") {
   try {
     await fastify.listen({ port: 3333, host: "0.0.0.0" });
@@ -126,5 +123,10 @@ if (process.env.NODE_ENV !== "production") {
   }
 }
 
-// Exporta o servidor pronto
-export default fastify;
+// =========================================================================
+// PONTE DE PRODUÇÃO: Traduz a requisição da Vercel para o Fastify
+// =========================================================================
+export default async function handler(req: any, res: any) {
+  await fastify.ready();
+  fastify.server.emit("request", req, res);
+}
