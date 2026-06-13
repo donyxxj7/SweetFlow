@@ -6,114 +6,119 @@ import { db } from "./db/index.js";
 import { tarefas, usuarios } from "./db/schema.js";
 import { eq, and } from "drizzle-orm";
 
-// Exportação limpa e direta para a Vercel Serverless interceptar
-export const fastify = Fastify({
+const fastify = Fastify({
   logger: true,
 });
 
-// Registra os plugins e rotas direto na instância principal do Fastify
-fastify.register(cors, {
-  origin: true,
-  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-});
+async function bootstrap() {
+  await fastify.register(cors, {
+    origin: true,
+    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  });
 
-// ROTA: TESTE DE SAÚDE (Para você testar direto no navegador e ver se o servidor responde)
-fastify.get("/", async () => {
-  return {
-    status: "online",
-    message: "Fábrica SweetFlow API ativa na Vercel!",
-  };
-});
+  // ROTA: TESTE DE SAÚDE
+  fastify.get("/", async () => {
+    return {
+      status: "online",
+      message: "Fábrica SweetFlow API ativa e rodando lisa na Vercel!",
+    };
+  });
 
-// ROTA: LOGIN
-fastify.post("/login", async (request, reply) => {
-  try {
-    const { login, senha } = request.body as { login: string; senha: string };
-    if (!login || !senha)
-      return reply.status(400).send({ error: "Campos obrigatórios." });
-    const [usuarioEncontrado] = await db
-      .select()
-      .from(usuarios)
-      .where(and(eq(usuarios.login, login), eq(usuarios.senha, senha)));
-    if (!usuarioEncontrado)
-      return reply.status(401).send({ error: "Incorretos." });
-    return reply
-      .status(200)
-      .send({
-        id: usuarioEncontrado.id,
-        nome: usuarioEncontrado.nome,
-        sector: usuarioEncontrado.setor,
-      });
-  } catch (erro) {
-    return reply.status(500).send({ error: "Erro no login." });
-  }
-});
+  // ROTA: LOGIN
+  fastify.post("/login", async (request, reply) => {
+    try {
+      const { login, senha } = request.body as { login: string; senha: string };
+      if (!login || !senha)
+        return reply.status(400).send({ error: "Campos obrigatórios." });
+      const [usuarioEncontrado] = await db
+        .select()
+        .from(usuarios)
+        .where(and(eq(usuarios.login, login), eq(usuarios.senha, senha)));
+      if (!usuarioEncontrado)
+        return reply.status(401).send({ error: "Incorretos." });
+      return reply
+        .status(200)
+        .send({
+          id: usuarioEncontrado.id,
+          nome: usuarioEncontrado.nome,
+          setor: usuarioEncontrado.setor,
+        });
+    } catch (erro) {
+      return reply.status(500).send({ error: "Erro no login." });
+    }
+  });
 
-// ROTA: LISTAGEM (GET)
-fastify.get("/tarefas", async (request, reply) => {
-  try {
-    const listaTarefas = await db.select().from(tarefas);
-    return listaTarefas;
-  } catch (erro) {
-    return reply.status(500).send({ error: "Falha ao buscar tarefas." });
-  }
-});
+  // ROTA: LISTAGEM (GET)
+  fastify.get("/tarefas", async (request, reply) => {
+    try {
+      const listaTarefas = await db.select().from(tarefas);
+      return listaTarefas;
+    } catch (erro) {
+      return reply.status(500).send({ error: "Falha ao buscar tarefas." });
+    }
+  });
 
-// ROTA: CRIAÇÃO (POST)
-fastify.post("/tarefas", async (request, reply) => {
-  try {
-    const { titulo, setorDestino, prioridade, prazo } = request.body as any;
-    const novaTarefa = await db
-      .insert(tarefas)
-      .values({
-        titulo,
-        setorDestino,
-        prioridade,
-        prazo,
-        responsavelId: "00000000-0000-0000-0000-000000000000",
-      })
-      .returning();
-    return reply.status(201).send(novaTarefa[0]);
-  } catch (erro) {
-    return reply.status(500).send({ error: "Erro ao salvar." });
-  }
-});
+  // ROTA: CRIAÇÃO (POST)
+  fastify.post("/tarefas", async (request, reply) => {
+    try {
+      const { titulo, setorDestino, prioridade, prazo } = request.body as any;
+      const novaTarefa = await db
+        .insert(tarefas)
+        .values({
+          titulo,
+          setorDestino,
+          prioridade,
+          prazo,
+          responsavelId: "00000000-0000-0000-0000-000000000000",
+        })
+        .returning();
+      return reply.status(201).send(novaTarefa[0]);
+    } catch (erro) {
+      return reply.status(500).send({ error: "Erro ao salvar." });
+    }
+  });
 
-// ROTA: ATUALIZAÇÃO (PATCH)
-fastify.patch("/tarefas/:id", async (request, reply) => {
-  try {
-    const { id } = request.params as { id: string };
-    const { status } = request.body as { status: any };
-    await db.update(tarefas).set({ status }).where(eq(tarefas.id, id));
-    return reply.status(200).send({ success: true });
-  } catch (erro) {
-    return reply.status(500).send({ error: "Falha ao atualizar." });
-  }
-});
+  // ROTA: ATUALIZAÇÃO (PATCH)
+  fastify.patch("/tarefas/:id", async (request, reply) => {
+    try {
+      const { id } = request.params as { id: string };
+      const { status } = request.body as { status: any };
+      await db.update(tarefas).set({ status }).where(eq(tarefas.id, id));
+      return reply.status(200).send({ success: true });
+    } catch (erro) {
+      return reply.status(500).send({ error: "Falha ao atualizar." });
+    }
+  });
 
-// ROTA: EXCLUSÃO (DELETE)
-fastify.delete("/tarefas/:id", async (request, reply) => {
-  try {
-    const { id } = request.params as { id: string };
-    const resultado = await db
-      .delete(tarefas)
-      .where(eq(tarefas.id, id))
-      .returning();
-    if (resultado.length === 0)
-      return reply.status(404).send({ error: "Não encontrada." });
-    return reply.status(200).send({ success: true });
-  } catch (erro) {
-    return reply.status(500).send({ error: "Erro ao deletar." });
-  }
-});
+  // ROTA: EXCLUSÃO (DELETE)
+  fastify.delete("/tarefas/:id", async (request, reply) => {
+    try {
+      const { id } = request.params as { id: string };
+      const resultado = await db
+        .delete(tarefas)
+        .where(eq(tarefas.id, id))
+        .returning();
+      if (resultado.length === 0)
+        return reply.status(404).send({ error: "Não encontrada." });
+      return reply.status(200).send({ success: true });
+    } catch (erro) {
+      return reply.status(500).send({ error: "Erro ao deletar." });
+    }
+  });
 
-// Inicialização local padrão (Ignorada pela Vercel em produção)
-if (process.env.NODE_ENV !== "production") {
-  try {
-    await fastify.listen({ port: 3333, host: "0.0.0.0" });
-    console.log("🚀 Local: http://localhost:3333");
-  } catch (err) {
-    process.exit(1);
+  // Inicialização local padrão (Ignorada pela Vercel em produção)
+  if (process.env.NODE_ENV !== "production") {
+    try {
+      await fastify.listen({ port: 3333, host: "0.0.0.0" });
+      console.log("🚀 Local: http://localhost:3333");
+    } catch (err) {
+      process.exit(1);
+    }
   }
 }
+
+bootstrap();
+
+// CORREÇÃO CIRÚRGICA: Adicionado o export default exigido pelo runtime da Vercel
+export default fastify;
