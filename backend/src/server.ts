@@ -43,13 +43,11 @@ fastify.post("/login", async (request, reply) => {
 
     if (!usuarioEncontrado)
       return reply.status(401).send({ error: "Incorretos." });
-    return reply
-      .status(200)
-      .send({
-        id: usuarioEncontrado.id,
-        nome: usuarioEncontrado.nome,
-        setor: usuarioEncontrado.setor,
-      });
+    return reply.status(200).send({
+      id: usuarioEncontrado.id,
+      nome: usuarioEncontrado.nome,
+      setor: usuarioEncontrado.setor,
+    });
   } catch (erro) {
     return reply.status(500).send({ error: "Erro no login." });
   }
@@ -66,9 +64,13 @@ fastify.get("/tarefas", async (request, reply) => {
 });
 
 // ROTA: CRIAÇÃO (POST)
+// ROTA: CRIAÇÃO (POST) - CORRIGIDA E DINÂMICA
 fastify.post("/tarefas", async (request, reply) => {
   try {
-    const { titulo, setorDestino, prioridade, prazo } = request.body as any;
+    // Adicionado o responsavelId na desestruturação do corpo da requisição
+    const { titulo, setorDestino, prioridade, prazo, responsavelId } =
+      request.body as any;
+
     const novaTarefa = await db
       .insert(tarefas)
       .values({
@@ -76,11 +78,14 @@ fastify.post("/tarefas", async (request, reply) => {
         setorDestino,
         prioridade,
         prazo,
-        responsavelId: "00000000-0000-0000-0000-000000000000",
+        // Agora grava o ID do membro selecionado no modal (Maira, etc.), ou usa o seu como fallback seguro
+        responsavelId: responsavelId || "00000000-0000-0000-0000-000000000000",
       })
       .returning();
+
     return reply.status(201).send(novaTarefa[0]);
   } catch (erro) {
+    fastify.log.error(erro); // Adicionado para você ver o erro real no terminal se falhar
     return reply.status(500).send({ error: "Erro ao salvar." });
   }
 });

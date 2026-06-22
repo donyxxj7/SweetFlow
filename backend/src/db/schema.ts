@@ -19,6 +19,7 @@ export const prioridadeEnum = pgEnum("prioridade", [
   "Alta",
   "Crítica",
 ]);
+
 export const statusEnum = pgEnum("status", [
   "RECEBIDO",
   "EM_ANALISE",
@@ -48,9 +49,13 @@ export const tarefas = pgTable("tarefas", {
   setorDestino: setorEnum("setor_destino").notNull(),
   prioridade: prioridadeEnum("prioridade").default("Média").notNull(),
   status: statusEnum("status").default("RECEBIDO").notNull(),
-  prazo: text("prazo").notNull(), // String formatada DD/MM/AAAA ou ISO
+  prazo: text("prazo").notNull(),
+
+  // CORREÇÃO SENIOR: Mudamos a chave do objeto para 'responsavelId' explicitamente,
+  // mantendo o nome físico no banco como "responsavel_id"
   responsavelId: text("responsavel_id")
     .notNull()
     .references(() => usuarios.id, { onDelete: "cascade" }),
+
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

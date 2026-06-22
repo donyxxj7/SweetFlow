@@ -30,12 +30,16 @@ export function Sidebar({
         />
       )}
 
-      {/* Estrutura CSS da Barra Lateral / Drawer */}
+      {/* 
+        CORREÇÃO SENIOR DE POSICIONAMENTO:
+        No mobile: vira uma gaveta fixa (fixed z-50) que entra e sai da tela (-translate-x-full).
+        No PC (md:): vira uma barra sticky (md:sticky md:translate-x-0 md:h-screen md:w-64) que ocupa espaço real na linha flex.
+      */}
       <aside
         className={`
         fixed top-0 bottom-0 left-0 w-64 bg-gray-900 border-r border-gray-800 p-6 flex flex-col justify-between z-50
         transition-transform duration-300 ease-in-out
-        md:translate-x-0 
+        md:sticky md:top-0 md:h-screen md:w-64 md:translate-x-0
         ${mobileAberto ? "translate-x-0" : "-translate-x-full"}
       `}
       >

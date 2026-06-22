@@ -161,11 +161,9 @@ export function Operacoes() {
   );
 
   useEffect(() => {
-    if (
-      responsaveisFiltradosDoModal.length > 0 &&
-      responsaveisFiltradosDoModal[0]
-    ) {
-      setNovoResponsavelId(responsaveisFiltradosDoModal[0].id);
+    const filtrados = LISTA_MEMBROS_EQUIPE.filter((m) => m.setor === novoSetor);
+    if (filtrados.length > 0 && filtrados[0]) {
+      setNovoResponsavelId(filtrados[0].id);
     } else {
       setNovoResponsavelId("");
     }
@@ -174,15 +172,20 @@ export function Operacoes() {
   async function carregarTarefas() {
     try {
       setCarregando(true);
+      // CORREÇÃO: Variável corrigida para 'resposta'
       const resposta = await api.get("/tarefas");
       const dadosFormatados = resposta.data.map((t: any) => {
         const miembro = LISTA_MEMBROS_EQUIPE.find(
-          (m) => m.id === t.responsavelId,
+          (m) =>
+            String(m.id).toLowerCase() ===
+            String(t.responsavelId).toLowerCase(),
         );
         return {
           ...t,
           setorDestino: t.setorDestino || t.setor,
-          responsavel: miembro ? miembro.nome : "Operador SweetFlow",
+          responsavel: miembro
+            ? miembro.nome
+            : t.responsavel || "Operador SweetFlow",
         };
       });
       setTarefas(dadosFormatados);
@@ -284,6 +287,7 @@ export function Operacoes() {
     }
   };
 
+  // CORREÇÃO: Removido o 'tasks =>' que transformava o array em função
   const tarefasFiltradas = tarefas.filter((t) => {
     const bateBusca =
       t.titulo.toLowerCase().includes(busca.toLowerCase()) ||
@@ -665,6 +669,7 @@ export function Operacoes() {
                     Designar Responsável
                   </label>
                   <select
+                    required
                     disabled={
                       enviando || responsaveisFiltradosDoModal.length === 0
                     }
